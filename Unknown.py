@@ -3,13 +3,40 @@ import numbers
 
 
 class Unknown:
-    def __init__(self, name: str, shift=0, scalar=1, recip=False):
+    def __init__(self, name: str, deg=1, scalar=1):
         self.name = name
-        self.shift = shift
+        self.deg = deg
         self.scalar = scalar
-        self.recip = recip
 
     def __str__(self):
+        scalar = self.scalar if self.deg == 0 else '' if self.scalar == 1 else '-' if self.scalar == -1 else str(
+            self.scalar) + ('/' if self.deg < 0 else '*' if isinstance(self.scalar, fractions.Fraction) else '')
+        return f"{scalar}{self.name}"
+
+    def __eq__(self,other):
+        if isinstance(other, Unknown):
+            return (self.name, self.deg, self.scalar) == (other.name, other.deg, other.scalar)
+        elif isinstance(other, numbers.Number):
+            if self.deg == 0 or self.scalar == 0:
+                return other == self.scalar
+            else:
+                return False
+        else:
+            return NotImplemented
+
+
+class formula:
+    def __init__(self, degi: dict[int:Unknown]):
+        self.degi = degi
+
+    @property
+    def highest(self):
+        return max(self.degi.keys())
+
+    def __str__(self):
+        back = ''
+        for d in range(self.highest)[::-1]:
+            if
         scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else str(self.scalar) + (
             '/' if self.recip else "*")
         shift = '' if self.shift == 0 else f"+ {self.shift}" if self.shift > 0 else f"- {abs(self.shift)}"
@@ -17,42 +44,40 @@ class Unknown:
 
     def __add__(self, other):
         if isinstance(other, numbers.Number):
-            return Unknown(self.name, self.shift + other, self.scalar)
+            return formula(self.name, self.shift + other, self.scalar)
         else:
             return NotImplemented
 
     def __mul__(self, other):
         if isinstance(other, numbers.Number):
-            return Unknown(self.name, self.shift * other, self.scalar * other)
+            return formula(self.name, self.shift * other, self.scalar * other)
         else:
             return NotImplemented
 
     def __sub__(self, other):
         if isinstance(other, numbers.Number):
-            return Unknown(self.name, self.shift - other, self.scalar)
+            return formula(self.name, self.shift - other, self.scalar)
         else:
             return NotImplemented
 
     def __rsub__(self, other):
         if isinstance(other, numbers.Number):
-            return Unknown(self.name, other - self.shift, -self.scalar)
+            return formula(self.name, other - self.shift, -self.scalar)
         else:
             return NotImplemented
 
     def __truediv__(self, other):
         if isinstance(other, numbers.Number):
-            return Unknown(self.name, fractions.Fraction(self.shift, other), fractions.Fraction(self.scalar, other))
+            return formula(self.name, fractions.Fraction(self.shift, other), fractions.Fraction(self.scalar, other))
         else:
             return NotImplemented
 
     def __neg__(self):
-        return self*-1
+        return self * -1
 
 
-def alg_addition(a: Unknown, b: Unknown):
+def alg_addition(a: formula, b: formula):
     if a.name == b.name:
-        if a.recip == b.recip:
-            return Unknown(a.name, a.shift + b.shift, a.scalar + b.scalar)
+        return formula(a.name, a.shift + b.shift, a.scalar + b.scalar)
 
 #   todo: object of single unknown and it's scalar, and seperete object of one side of the equation.
-
