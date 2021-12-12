@@ -43,9 +43,17 @@ class Formula:
         except IndexError:
             return 0
 
+    def sorted_keys(self, reverse=True):
+        xi = list(self.degi.keys())
+        xi.sort(reverse=reverse)
+        return xi
+
+    def key_union(self, other):
+        return set(self.degi.keys()).union(set(other.degi.keys()))
+
     def __str__(self):
         back = ''
-        for d in range(self.highest, self.lowest - 1, -1):
+        for d in self.sorted_keys():
             if self[d] == 0:
                 continue
             oper = "" if d == self.highest else "+ " if self[d].scalar >= 0 else "- "
@@ -56,12 +64,14 @@ class Formula:
         if other == 0:
             return all(u == 0 for u in self)
         elif isinstance(other, Formula):
-            return all(self[d] == other[d] for d in range(max(self.highest, other.highest)))
+            return all(self[d] == other[d] for d in self.key_union(other))
         else:
             return False
 
-"""
     def __add__(self, other):
+        back = Formula({})
+        for d in self.key_union(other):
+            back[d] = Unknown()
         if isinstance(other, numbers.Number):
             return formula(self.name, self.shift + other, self.scalar)
         else:
@@ -100,4 +110,4 @@ def alg_addition(a: formula, b: formula):
         return formula(a.name, a.shift + b.shift, a.scalar + b.scalar)
 """
 
-#   todo: object of single unknown and it's scalar, and seperete object of one side of the equation.
+#   todo: object of single unknown and it's scalar, and separate object of one side of the equation.
