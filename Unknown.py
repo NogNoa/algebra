@@ -3,13 +3,15 @@ import numbers
 
 
 class Unknown:
-    def __init__(self, name: str, shift=0, scalar=1):
+    def __init__(self, name: str, shift=0, scalar=1, recip=False):
         self.name = name
         self.shift = shift
         self.scalar = scalar
+        self.recip = recip
 
     def __str__(self):
-        scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else f"{self.scalar}*"
+        scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else str(self.scalar) + (
+            '/' if self.recip else "*")
         shift = '' if self.shift == 0 else f"+ {self.shift}" if self.shift > 0 else f"- {abs(self.shift)}"
         return f"{scalar}{self.name} {shift}"
 
@@ -43,9 +45,14 @@ class Unknown:
         else:
             return NotImplemented
 
+    def __neg__(self):
+        return self*-1
 
-class reciprocal(Unknown):
-    def __str__(self):
-        scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else f"{self.scalar}/"
-        shift = '' if self.shift == 0 else f"+ {self.shift}" if self.shift > 0 else f"- {abs(self.shift)}"
-        return f"{scalar}{self.name} {shift}"
+
+def alg_addition(a: Unknown, b: Unknown):
+    if a.name == b.name:
+        if a.recip == b.recip:
+            return Unknown(a.name, a.shift + b.shift, a.scalar + b.scalar)
+
+#   todo: object of single unknown and it's scalar, and seperete object of one side of the equation.
+
