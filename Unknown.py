@@ -5,5 +5,5 @@ class Unknown:
         self.scalar = scalar
 
     def __str__(self):
-        return f"{self.scalar}{self.name} + {self.shift}"
+        return f"{self.scalar if self.scalar != 1 else ''}{self.name}{'+ '+ str(self.shift) if self.shift != 0 else ''}"
 
