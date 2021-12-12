@@ -8,6 +8,9 @@ class Unknown:
         self.deg = deg
         self.scalar = scalar
 
+    def iscomp(self, other):
+        return isinstance(other, Unknown) and self.name == other.name
+
     def __str__(self):
         scalar = self.scalar if self.deg == 0 else '' if self.scalar == 1 else '-' if self.scalar == -1 else str(
             self.scalar) + ('/' if self.deg < 0 else '*' if isinstance(self.scalar, fractions.Fraction) else '')
@@ -47,10 +50,13 @@ class Formula:
     def __setitem__(self, d, v):
         self.degi[d] = v
 
+    def iscomp(self, other):
+        return isinstance(other, Formula) and self.name == other.name
+
     def sorted_keys(self, reverse=True):
-        xi = list(self.degi.keys())
-        xi.sort(reverse=reverse)
-        return xi
+        χi = list(self.degi.keys())
+        χi.sort(reverse=reverse)
+        return χi
 
     def key_union(self, other):
         return set(self.degi.keys()).union(set(other.degi.keys()))
@@ -73,7 +79,7 @@ class Formula:
             return False
 
     def __add__(self, other):
-        if isinstance(other, Formula) and self.name == other.name:
+        if self.iscomp(other):
             back = Formula(self.name, {})
             for d in self.key_union(other):
                 back[d] = Unknown(self.name, d, self[d].scalar + other[d].scalar)
