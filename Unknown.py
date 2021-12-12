@@ -13,7 +13,7 @@ class Unknown:
             self.scalar) + ('/' if self.deg < 0 else '*' if isinstance(self.scalar, fractions.Fraction) else '')
         return f"{scalar}{self.name}"
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         if isinstance(other, Unknown):
             return (self.name, self.deg, self.scalar) == (other.name, other.deg, other.scalar)
         elif isinstance(other, numbers.Number):
@@ -25,9 +25,9 @@ class Unknown:
             return NotImplemented
 
 
-class formula:
-    def __init__(self, degi: dict[int:Unknown]):
-        self.degi = degi
+class Formula:
+    def __init__(self, degi: dict[int:tuple]):
+        self.degi = {d: Unknown(*t) for (d, t) in degi.items()}
 
     @property
     def highest(self):
@@ -38,16 +38,27 @@ class formula:
         return min(self.degi.keys())
 
     def __getitem__(self, d):
-        return self.degi[d]
+        try:
+            return self.degi[d]
+        except IndexError:
+            return 0
 
     def __str__(self):
         back = ''
-        for d in range(self.highest, self.lowest-1, -1):
+        for d in range(self.highest, self.lowest - 1, -1):
             if self[d] == 0:
                 continue
             oper = "" if d == self.highest else "+ " if self[d].scalar >= 0 else "- "
             back += f"{oper}{self[d]} "
         return back
+
+    def __eq__(self, other):
+        if other == 0:
+            return all(u == 0 for u in self)
+        elif isinstance(other, Formula):
+            return all(self[d] == other[d] for d in range(max(self.highest, other.highest)))
+        else:
+            return False
 
 """
     def __add__(self, other):
