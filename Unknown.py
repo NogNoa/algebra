@@ -26,8 +26,9 @@ class Unknown:
 
 
 class Formula:
-    def __init__(self, degi: dict[int:tuple]):
-        self.degi = {d: Unknown(*t) for (d, t) in degi.items()}
+    def __init__(self, name: str, degi: dict[int:numbers.Number]):
+        self.name = name
+        self.degi = {d: Unknown(name, d, n) for (d, n) in degi.items()}
 
     @property
     def highest(self):
@@ -42,6 +43,9 @@ class Formula:
             return self.degi[d]
         except IndexError:
             return 0
+
+    def __setitem__(self, d, v):
+        self.degi[d] = v
 
     def sorted_keys(self, reverse=True):
         xi = list(self.degi.keys())
@@ -69,14 +73,16 @@ class Formula:
             return False
 
     def __add__(self, other):
-        back = Formula({})
-        for d in self.key_union(other):
-            back[d] = Unknown()
-        if isinstance(other, numbers.Number):
-            return formula(self.name, self.shift + other, self.scalar)
+        if isinstance(other, Formula) and self.name == other.name:
+            back = Formula(self.name, {})
+            for d in self.key_union(other):
+                back[d] = Unknown(self.name, d, self[d].scalar + other[d].scalar)
+            return back
         else:
             return NotImplemented
 
+
+"""
     def __mul__(self, other):
         if isinstance(other, numbers.Number):
             return formula(self.name, self.shift * other, self.scalar * other)
