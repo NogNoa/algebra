@@ -9,7 +9,7 @@ class Unknown:
         self.scalar = scalar
 
     def __str__(self):
-        scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else self.scalar
+        scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else f"{self.scalar}*"
         shift = '' if self.shift == 0 else f"+ {self.shift}" if self.shift > 0 else f"- {abs(self.shift)}"
         return f"{scalar}{self.name} {shift}"
 
@@ -19,7 +19,7 @@ class Unknown:
         else:
             return NotImplemented
 
-    def __mult__(self, other):
+    def __mul__(self, other):
         if isinstance(other, numbers.Number):
             return Unknown(self.name, self.shift * other, self.scalar * other)
         else:
@@ -43,3 +43,9 @@ class Unknown:
         else:
             return NotImplemented
 
+
+class reciprocal(Unknown):
+    def __str__(self):
+        scalar = '' if self.scalar == 1 else '-' if self.scalar == -1 else f"{self.scalar}/"
+        shift = '' if self.shift == 0 else f"+ {self.shift}" if self.shift > 0 else f"- {abs(self.shift)}"
+        return f"{scalar}{self.name} {shift}"
