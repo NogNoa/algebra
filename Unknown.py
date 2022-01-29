@@ -11,6 +11,10 @@ class Unknown:
     def iscomp(self, other):
         return isinstance(other, Unknown) and self.name == other.name
 
+    @property
+    def val(self):
+        return lambda x: self.scalar * x ** self.deg
+
     def __str__(self):
         scalar = self.scalar if self.deg == 0 else '' if self.scalar == 1 else '-' if self.scalar == -1 else str(
             self.scalar) + ('/' if self.deg < 0 else '*' if isinstance(self.scalar, fractions.Fraction) else '')
