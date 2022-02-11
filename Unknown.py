@@ -8,6 +8,15 @@ class Unknown:
         self.deg = deg
         self.scalar = scalar
 
+    @staticmethod
+    def eval(call):
+        call = call.split('^')
+        deg = int(call[1])
+        deg = deg if deg else None
+        name = ''.join(x for x in call[0] if x.isalpha())
+        scalar = int(''.join(x for x in call[0] if x.isdigit()))
+        return name, deg, scalar
+
     def iscomp(self, other):
         return isinstance(other, Unknown) and self.name == other.name
 
@@ -18,7 +27,7 @@ class Unknown:
     def __str__(self):
         scalar = self.scalar if self.deg == 0 else '' if self.scalar == 1 else '-' if self.scalar == -1 else str(
             self.scalar) + ('/' if self.deg < 0 else '*' if isinstance(self.scalar, fractions.Fraction) else '')
-        return f"{scalar}{self.name}"
+        return f"{scalar}{self.name}^{self.deg}"
 
     def __eq__(self, other):
         if isinstance(other, Unknown):
